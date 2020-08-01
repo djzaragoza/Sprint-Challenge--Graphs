@@ -96,13 +96,47 @@ def backtrack(direction):
     else:
         return 'e'
 
-        
+path = [random.choice(player.current_room.get_exits())]
+s.push(path)
+# while the stack is not empty ....
 
+while s.size() > 0:
+    # pop from the top of the stack, this is our current path.
+    current_path = s.pop()
+    # current_direciton is the last thing in the path
+    current_direction = current_path[-1]
+    curr_room_id = player.current_room.id
+    print('current_node', curr_room_id)
+    #check if we've visited yet, if not:
+    if curr_room_id not in vistied:
+        # mark as visited
+        visited[curr_room_id] = {}
+        # get the current room's exists
+        neighboring_rooms = player.current_room.get_exits()
 
+        for room in neighboring_rooms:
+            visited[curr_room_id][room] = '?'
+        traversal_path.append(current_direction)
 
+        next_room = random.choice(neighboring_rooms)
 
+        # iterate over the neighboring_rooms
+        for room in neighboring_rooms:
+            print('Room', room)
+            # add the neighbor to the path
+            neighbor_path = current_path.copy()
+            neighbor_path.append(room)
+            print('Neighbor Path', neighbor_path)
+            # push the neighbor's path on the stack
+            s.push(neighbor_path)
 
+        # loop through each of the exits for the current_room
+        # if the value is '?', then add that room to the stack to be visited
 
+        player.travel(next_room)
+        visited[curr_room_id][next_room] = player.current_room.id
+print('Visited', visited)
+print('Traversal Path', traversal_path)
 
 
 # TRAVERSAL TEST - DO NOT MODIFY
