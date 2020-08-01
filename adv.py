@@ -14,7 +14,7 @@ world = World()
 # map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
 # map_file = "maps/test_loop_fork.txt"
-map_file = "maps/main_maze.txt"
+# map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph=literal_eval(open(map_file, "r").read())
@@ -29,6 +29,36 @@ player = Player(world.starting_room)
 # traversal_path = ['n', 'n']
 traversal_path = []
 
+# queue and stack classes to use with graph traversals
+
+class Queue():
+    def __init__(self):
+        self.queue = []
+    def enqueue(self, value):
+        self.queue.append(value)
+    def dequeue(self):
+        if self.size() > 0:
+            return self.queue.pop(0)
+        else:
+            return None
+    def size(self):
+        return len(self.queue)
+
+
+class Stack():
+    def __init__(self):
+         self.stack = []
+    def push(self, value):
+        self.stack.append(value)
+    def pop(self):
+        if self.size() > 0:
+            return self.stack.pop()
+        else:
+            return None
+    def size(self):
+        return len(self.stack)
+
+# Begin by writing an algorithm that picks a random unexplored direction 
 
 
 # TRAVERSAL TEST - DO NOT MODIFY
