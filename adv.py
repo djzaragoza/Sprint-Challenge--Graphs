@@ -14,7 +14,7 @@ world = World()
 # map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
 # map_file = "maps/test_loop_fork.txt"
-# map_file = "maps/main_maze.txt"
+map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph=literal_eval(open(map_file, "r").read())
@@ -29,115 +29,43 @@ player = Player(world.starting_room)
 # traversal_path = ['n', 'n']
 traversal_path = []
 
-# queue and stack classes to use with graph traversals
+# keep track of reverse directions
+# use this to return to a room with valid moves
+backtrack = []
+reversed_directions = {'n': 's', 's': 'n', 'e': 'w', 'w': 'e'}
 
-class Queue():
-    def __init__(self):
-        self.queue = []
-    def enqueue(self, value):
-        self.queue.append(value)
-    def dequeue(self):
-        if self.size() > 0:
-            return self.queue.pop(0)
-        else:
-            return None
-    def size(self):
-        return len(self.queue)
+# instantiate a set to keep track of visited rooms
+visited = set()
 
+# while there are still unvisited rooms
+while len(visited) < len(room_graph):
+    
+    # initialize next move as None
+    next_move = None
 
-class Stack():
-    def __init__(self):
-         self.stack = []
-    def push(self, value):
-        self.stack.append(value)
-    def pop(self):
-        if self.size() > 0:
-            return self.stack.pop()
-        else:
-            return None
-    def size(self):
-        return len(self.stack)
-
-# Begin by writing an algorithm that picks a random unexplored direction from player's current room, travels and logs that direction, then loops.
-## this should cause your player to walk a depth first traversal.  When you reach a dead-end, walk back to nearest room that does not contain an
-## unexplored path
-
-# first pass pseudocode
-# start traversal from room 0
-# choose direction (random) and perform depth-first traversal down the path
-# keep track of visited room
-# keep track of path that we have visited
-# when a room has been reached that has nothing left to explore, we will need to back track to look for a new path
-# when a direction is selected, add it to the traversal_path list
-# for each rooom you enter:
-# - call player.current_room.id -> room ID to add to the
-# - call player.current_room.get_exits
-# - perform a breadth first search to fill in the details for any room with a '?' for an exit
-# - the '?' will be the focus of the search, instead of a target vertex
-# - if an exit has been explored, you can put it iin your BFS queue
-# - BFS will return the path as a list of room IDs.  you will need to convert this toa  list of n/s/e/w directions before you can add
-#  it to your traversal path
-# - call player.travel(direction) to ove to the next room
-
-visited = {}  # dictionary
-# create an empty queue and enqueue A PATH TO the starting vertex ID
-s = Stack()
-# hold the ID of the starting room:
-starting_room = player.current_room.id
-
-# get direction for backtracking once all the exists of a room have been searched
-def backtrack(direction):
-    if direction == 'n':
-        return 's'
-    elif direction == 's':
-        return 'n'
-    elif direction == 'e':
-        return 'w'
+    # for each exit(neighbor) in the room expresed by (n,s,e,w)
+    for ex in player.current_room.get_exits():
+        # for each exit, if its not been visited, set as the next move
+        if player.current_room.get_room_in_direction(ex) not in visited:
+            next_move = ex
+    # if there is a viable move ....
+    if next_move is not None:
+        # append the move to the traversal_path (list of all steps taken)
+        traversal_path.append(next_move)
+        # add the reversed direction to the breadcrumb trail (backtrack)
+        backtrack.append(reversed_directions[next_move])
+        # make the move and add room to visited list
+        player.travel(next_move)
+        visited.add(player.current_room)
     else:
-        return 'e'
-
-path = [random.choice(player.current_room.get_exits())]
-s.push(path)
-# while the stack is not empty ....
-
-while s.size() > 0:
-    # pop from the top of the stack, this is our current path.
-    current_path = s.pop()
-    # current_direciton is the last thing in the path
-    current_direction = current_path[-1]
-    curr_room_id = player.current_room.id
-    print('current_node', curr_room_id)
-    #check if we've visited yet, if not:
-    if curr_room_id not in vistied:
-        # mark as visited
-        visited[curr_room_id] = {}
-        # get the current room's exists
-        neighboring_rooms = player.current_room.get_exits()
-
-        for room in neighboring_rooms:
-            visited[curr_room_id][room] = '?'
-        traversal_path.append(current_direction)
-
-        next_room = random.choice(neighboring_rooms)
-
-        # iterate over the neighboring_rooms
-        for room in neighboring_rooms:
-            print('Room', room)
-            # add the neighbor to the path
-            neighbor_path = current_path.copy()
-            neighbor_path.append(room)
-            print('Neighbor Path', neighbor_path)
-            # push the neighbor's path on the stack
-            s.push(neighbor_path)
-
-        # loop through each of the exits for the current_room
-        # if the value is '?', then add that room to the stack to be visited
-
-        player.travel(next_room)
-        visited[curr_room_id][next_room] = player.current_room.id
-print('Visited', visited)
-print('Traversal Path', traversal_path)
-
+        # there is no valid roon = use backtrack to go back and find a room
+        # with a valid move
+        # pop the last entry from backtrack
+        next_move = backtrack.pop()
+        # add that move to traversal_path
+        traversal_path.append(next_move)
+        # make the moves
+        player.travel(next_move)
 
 # TRAVERSAL TEST - DO NOT MODIFY
 visited_rooms = set()
