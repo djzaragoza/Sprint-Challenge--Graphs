@@ -58,7 +58,51 @@ class Stack():
     def size(self):
         return len(self.stack)
 
-# Begin by writing an algorithm that picks a random unexplored direction 
+# Begin by writing an algorithm that picks a random unexplored direction from player's current room, travels and logs that direction, then loops.
+## this should cause your player to walk a depth first traversal.  When you reach a dead-end, walk back to nearest room that does not contain an
+## unexplored path
+
+# first pass pseudocode
+# start traversal from room 0
+# choose direction (random) and perform depth-first traversal down the path
+# keep track of visited room
+# keep track of path that we have visited
+# when a room has been reached that has nothing left to explore, we will need to back track to look for a new path
+# when a direction is selected, add it to the traversal_path list
+# for each rooom you enter:
+# - call player.current_room.id -> room ID to add to the
+# - call player.current_room.get_exits
+# - perform a breadth first search to fill in the details for any room with a '?' for an exit
+# - the '?' will be the focus of the search, instead of a target vertex
+# - if an exit has been explored, you can put it iin your BFS queue
+# - BFS will return the path as a list of room IDs.  you will need to convert this toa  list of n/s/e/w directions before you can add
+#  it to your traversal path
+# - call player.travel(direction) to ove to the next room
+
+visited = {}  # dictionary
+# create an empty queue and enqueue A PATH TO the starting vertex ID
+s = Stack()
+# hold the ID of the starting room:
+starting_room = player.current_room.id
+
+# get direction for backtracking once all the exists of a room have been searched
+def backtrack(direction):
+    if direction == 'n':
+        return 's'
+    elif direction == 's':
+        return 'n'
+    elif direction == 'e':
+        return 'w'
+    else:
+        return 'e'
+
+        
+
+
+
+
+
+
 
 
 # TRAVERSAL TEST - DO NOT MODIFY
